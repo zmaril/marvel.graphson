@@ -1,4 +1,6 @@
-This makefile downloads data concerning the
+_marvel.graphson_
+
+The makefile downloads data concerning the
 [appearance of Marvel characters in comic books](http://www.infochimps.com/datasets/marvel-universe-social-graph)
 and then converts the data into
 [graphSON](https://github.com/tinkerpop/blueprints/wiki/GraphSON-Reader-and-Writer-Library). To
