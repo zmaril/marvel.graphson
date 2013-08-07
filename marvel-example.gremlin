@@ -1,0 +1,14 @@
+g = TinkerGraphFactory.createTinkerGraph()
+g.E().remove()
+g.V().remove()
+GraphSONReader.inputGraph(g,new FileInputStream(new File("marvel.graphson")))
+
+m=[:]
+g.V().hasNot("name",null).groupBy(m){it.name}{it.out}{it.size()}.iterate;null;
+m.sort{a,b -> b.value <=> a.value}[0..10]
+
+n=[:]
+g.V().hasNot("title",null).groupBy(n){it.title}{it.in}{it.size()}.iterate();null;
+n.sort{a,b -> b.value <=> a.value}[0..10]
+
+//comics     = g.V().hasNot("title",null)

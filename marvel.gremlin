@@ -1,0 +1,67 @@
+g = TitanFactory.open("/tmp/marvel_graph")
+g.makeType().name("name").dataType(String).indexed(Vertex).unique(OUT).makePropertyKey();
+g.makeType().name("title").dataType(String).indexed(Vertex).unique(OUT).makePropertyKey();
+g.E().remove();
+g.V().remove();
+
+f = new File("16320/labeled_edges.tsv")
+
+f.readLines().each{line-> 
+	line = line.split("\t"); 
+	//	print("Working on line:")
+	//	println(line)
+
+	character = line[0][1..-2] // remove "" and whitespace
+	characterV = null;
+	characters = g.getVertices("name",character);
+	//print("characters: ")
+	//	println(characters)
+	if (characters.count() == 0){
+		characterV = g.addVertex()
+		characterV.setProperty("name",character)
+	}			
+	else if (characters.count() == 1){
+		characterV = characters.get(0)
+	}
+	else {
+		println("Too many characters with the name:"+character)
+		throw new Error()
+	}
+
+	comic = line[1][1..-2];	
+	comicV = null;		
+	comics = g.getVertices("title",comic)
+	//print("comics:")
+	//println(comics)
+	if (comics.count() == 0){
+		comicV = g.addVertex()
+		comicV.setProperty("title",comic)
+	}			
+	else if (comics.count() == 1){
+		comicV = comics.get(0)
+	}
+	else {
+		println("Too many comics with the title:"+comic)
+		throw new Error()
+	}
+	
+	//	println(character)
+	//	println(characters)
+	//	println(characterV.map.fill([]))
+	//	println(comic)
+	//	println(comics)
+	//	println(comicV.map.fill([]))
+	g.addEdge(characterV,comicV,"appearsIn")
+}
+
+//OUTPUT steram
+GraphSONWriter.outputGraph(g,new FileOutputStream(new File("marvel.graphson")))
+
+g = TinkerGraphFactory.createTinkerGraph()
+g.E().remove()
+g.V().remove()
+GraphSONReader.inputGraph(g,new FileInputStream(new File("marvel.graphson")))
+
+g.V().hasNot("name",null).groupBy{it}{it.out.gather.count}.cap
+comics     = g.V().hasNot("title",null)
+
